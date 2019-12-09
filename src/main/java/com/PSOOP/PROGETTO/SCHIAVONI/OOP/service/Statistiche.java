@@ -89,7 +89,7 @@ public class Statistiche {
         Map<String,Object> map = new HashMap<>();
         map.put("attributo: ", attributo);
         if(!lista.isEmpty()){
-            if(ServiceAzAgr.Time.contains(attributo)){ //controllo se l'attributo è di uno degli anni
+            if(ServiceAzAgr.Anni.contains(attributo)){ //controllo se l'attributo è di uno degli anni
                 List<Double> valori = new ArrayList<>();
                 for (Object obj : lista){
                     valori.add(((Double) obj));

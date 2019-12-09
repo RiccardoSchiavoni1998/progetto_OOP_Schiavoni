@@ -8,7 +8,7 @@ public class AziendaAgricola {
     private double[] time;
 
     //costruttore della classe modellante
-    public AziendaAgricola (String argrarea, String croprea, String indic_ef, String geo, double[] contributo){
+    public AziendaAgricola (String agrarea, String croparea, String indic_ef, String geo, double[] time){
         this.agrarea = agrarea;
         this.croparea = croparea;
         this.indic_ef = indic_ef;

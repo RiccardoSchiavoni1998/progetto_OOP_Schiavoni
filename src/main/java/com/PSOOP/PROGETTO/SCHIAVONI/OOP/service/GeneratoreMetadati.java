@@ -16,8 +16,7 @@ import java.util.Map;
  * Classe per generare i metadati
  */
 public class GeneratoreMetadati {
-        private static List<Map> Metadati = new ArrayList(); //creo lista di mappe per i metadati degli attributi, ogni mappa conterrà i metadati di un singolo attributo : nome nella classe, nome nel file, tipo
-
+        private static List<Map> Metadati = new ArrayList<>(); //creo lista di mappe per i metadati degli attributi, ogni mappa conterrà i metadati di un singolo attributo : nome nella classe, nome nel file, tipo
         /**
         * Genero la lista dei metadati: nome dei campi nel dataset , il nome e il tipo della variabile nella classe modello
         *  */
@@ -40,8 +39,6 @@ public class GeneratoreMetadati {
                 k++;
             }
         };
-
-        //public static List<Map> getMetadati() {return Metadati;}; //metodo che mi restituisce la lista dei metadati
 };
 
 

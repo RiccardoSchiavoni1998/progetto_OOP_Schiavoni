@@ -24,21 +24,21 @@ import java.util.Map;
 public class ServiceAzAgr {
     private String fileTSV= "dataset.tsv";
     private String url= "http://data.europa.eu/euodp/data/api/3/action/package_show?id=PsCGW1qneloocoRKWv6ZYA"; //url di ingresso (del file JSON)
-    static List<String> Time=new ArrayList<>();
-    private static List<Map> Metadati = new ArrayList(); //creo lista di mappe per i metadati degli attributi, ogni mappa conterrà i metadati di un singolo attributo : nome nel file, nome e tipo nella classe
-    private List<AziendaAgricola> Dati = new ArrayList<>();
+    static List<String> Anni=new ArrayList<>();
+    private static List<Map> ListaMetadati = new ArrayList(); //creo lista di mappe per i metadati degli attributi, ogni mappa conterrà i metadati di un singolo attributo : nome nel file, nome e tipo nella classe
+    private List<AziendaAgricola> ListaDati = new ArrayList<>();
 
     /**
      * Costruttore della classe, esegue la codifica del file JSON ed esegue il download, in seguito riempie la lista dei Dati e dei Metadati
      */
     public ServiceAzAgr() throws Exception {
-        Time.add(Integer.toString(2005));
-        Time.add(Integer.toString(2007));
-        Time.add(Integer.toString(2010));
-        Time.add(Integer.toString(2013));
+        Anni.add(Integer.toString(2005));
+        Anni.add(Integer.toString(2007));
+        Anni.add(Integer.toString(2010));
+        Anni.add(Integer.toString(2013));
         if(Files.exists ( Paths.get ( fileTSV) )){ //controllo se il file è presente in loacele
-            Dati = (List<AziendaAgricola>) new Parsing(fileTSV); //eseguo il parsing del file, generando la lista dei dati
-            Metadati = (List<Map>) new GeneratoreMetadati(fileTSV); //genero la lista dei metadati
+            ListaDati = (List<AziendaAgricola>) new Parsing(fileTSV); //eseguo il parsing del file, generando la lista dei dati
+            ListaMetadati = (List<Map>) new GeneratoreMetadati(fileTSV); //genero la lista dei metadati
         }else{
             try {//La classe astratta URL Connection è la superclasse di tutte le classi che rappresentano un collegamento di comunicazione tra l'applicazione e un URL. Le istanze di questa classe possono essere utilizzate sia per leggere che per scrivere nella risorsa a cui fa riferimento l'URL.
                 URLConnection openConnection = new URL(url).openConnection(); //L'oggetto connessione openConnection viene creato richiamando sull'url di igresso openConnection (metodo di URLConnection)
@@ -70,14 +70,13 @@ public class ServiceAzAgr {
                         }
                     }
                 }
-                Dati = (List<AziendaAgricola>) new Parsing(fileTSV); //eseguo il parsing del file scaricato, generando la lista dei dati
-                Metadati = (List<Map>) new GeneratoreMetadati(fileTSV); //genero la lista dei metadati
+                ListaDati = (List<AziendaAgricola>) new Parsing(fileTSV); //eseguo il parsing del file scaricato, generando la lista dei dati
+                ListaMetadati = (List<Map>) new GeneratoreMetadati(fileTSV); //genero la lista dei metadati
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
     }
-
 
     private static void downloadTSV(String url, String fileName) throws Exception {
         HttpURLConnection openConnection = (HttpURLConnection) new URL(url).openConnection();
@@ -102,12 +101,12 @@ public class ServiceAzAgr {
     /**
      * Metodo che genera la lista dei Dati
      */
-     public List<AziendaAgricola> getDati(){return Dati;}
+     public List<AziendaAgricola> getDati(){return ListaDati;}
 
     /**
      * Metodo che genera la lista dei Metadati
      */
-    public List<Map> getMetadati(){return Metadati;}
+    public List<Map> getMetadati(){return ListaMetadati;}
 
     /**
      * Metodo che crea una lista con tutti i valori di un singolo attributo della classe
@@ -115,13 +114,13 @@ public class ServiceAzAgr {
     private List listaValoriCampo(String Campo){
             List<Object> valoriCampo = new ArrayList<>();
             try {
-                if(Time.contains(Campo)){ //verifico il caso in cui il nome del campo si uno degli anni all'interno del vettore time
-                    for(AziendaAgricola Azienda : Dati){
+                if(Anni.contains(Campo)){ //verifico il caso in cui il nome del campo si uno degli anni all'interno del vettore time
+                    for(AziendaAgricola Azienda : ListaDati){
                         Object o = Azienda.getTime()[Integer.parseInt(Campo)];
                         valoriCampo.add(o);
                     }
                 }else{
-                    for(AziendaAgricola Azienda : Dati){
+                    for(AziendaAgricola Azienda : ListaDati){
                         Method getter = AziendaAgricola.class.getMethod("get" + Campo.substring(0, 1).toUpperCase() + Campo.substring(1)); //costruisco il metodo get del modello di riferimento
                         Object value = getter.invoke(Azienda); //invoco il metodo get sull'oggetto della classe modellante
                         valoriCampo.add(value); //aggiungo il valore alla lista
