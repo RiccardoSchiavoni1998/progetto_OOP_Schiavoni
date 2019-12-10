@@ -10,10 +10,10 @@ import java.util.List;
 
 public class Parsing {
     private static final String TAB_DELIMITER = "\t";
-    private List<AziendaAgricola> record = new ArrayList<>();
+    private List<AziendaAgricola> dati = new ArrayList<>();
 
     /**
-     * Legge il contenuto del dataset e genera la lista dei dati
+     * costruttore che legge il contenuto del fileTSV e genera la lista dei dati alll'interno
      */
     public Parsing (String FileTSV) throws Exception { //vado a creare una lista di istanze della classe AziendaAgricola , i campi dell'istanza i-esima conterranno i rispettivi valori dell'i-esima riga del filE
         //creo oggetto br, straem bufferizzato, e passo al costruttore lo stream basico (va a leggere il fileTSV)
@@ -28,17 +28,26 @@ public class Parsing {
                 String croparea = splittedLine[1].trim();
                 String indic_ef = splittedLine[2].trim();
                 String geo = splittedLine[3].trim();
-                int dimensione = 4;
-                double[] time = new double[dimensione]; //creo il vettore che contiene i valori di tipo double in corrispondenza degli anni
-                for (int i = 0; i < dimensione; i++) {
-                    time[i] = Double.parseDouble(splittedLine[4 + i].trim());
+                Double [] time = new Double[4]; //creo il vettore che contiene i valori di tipo double in corrispondenza degli anni
+                //Vector <Double> time = new Vector <Double> () ;
+                for (int i = 0; i < 4 ; i++) {
+                    if(4+i < splittedLine.length){
+                        time[i] =  Double.parseDouble(splittedLine[4 + i].trim());
+                    }else time[i] = (double) 0;
                 }
-                AziendaAgricola CM = new AziendaAgricola(agrarea, croparea, indic_ef, geo, time); // ogni ciclo creo un nuovo oggetto ,chiamato CM, che contiene i valori ottenuti dal parsing della riga del file considerata nello specifico passo del ciclo
-                record.add(CM); // inserisco oggetto CM nella lista record
+                AziendaAgricola CM = new AziendaAgricola(agrarea, croparea, indic_ef, geo, time ); // ogni ciclo creo un nuovo oggetto ,chiamato CM, che contiene i valori ottenuti dal parsing della riga del file considerata nello specifico passo del ciclo
+                dati.add(CM); // inserisco oggetto CM nella lista record
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-};
+    /**
+     * metodo che restituisce tutti i dati del dataset
+     */
+    public List<AziendaAgricola> getRecord(){
+        return dati;
+    }
+
+}

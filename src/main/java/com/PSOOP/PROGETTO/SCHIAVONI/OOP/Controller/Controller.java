@@ -11,8 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 import java.util.Map;
 
-/*
-* Richiesta mediante API REST GET O POST
+/**
 * RESTITUIRE METADATI , DATI , STATISTICHE SUI DATO, SPECIFICANDO L'ATTRIBUTO (COLONNA DEI DATI) SU CUI SI EFFETTUA LA COMPUTAZIONE */
 /*
      @GetMapping("/risorsa") facendo una chiamata di tipo get posso ottenere una determinata risorsa che ci restituirà un determinato metodo
@@ -46,7 +45,7 @@ public class Controller {
     }
 
     @GetMapping("/StatisticheCampo")
-    public Map visualizzaStatisticheCampo(@RequestParam (value="campo",defaultValue ="") String Campo) {
+    public Map visualizzaStatisticheCampo(@RequestParam (value="campo", required = false,defaultValue ="") String Campo) {
         return service.getStatisticheSingoloCampo(Campo);
     }
 

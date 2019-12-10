@@ -32,13 +32,15 @@ public class ServiceAzAgr {
      * Costruttore della classe, esegue la codifica del file JSON ed esegue il download, in seguito riempie la lista dei Dati e dei Metadati
      */
     public ServiceAzAgr() throws Exception {
-        Anni.add(Integer.toString(2005));
+        Anni.add(Integer.toString(2005)); // creo il vettore degli anni che mi servirà nella creazione delle statistiche
         Anni.add(Integer.toString(2007));
         Anni.add(Integer.toString(2010));
         Anni.add(Integer.toString(2013));
-        if(Files.exists ( Paths.get ( fileTSV) )){ //controllo se il file è presente in loacele
-            ListaDati = (List<AziendaAgricola>) new Parsing(fileTSV); //eseguo il parsing del file, generando la lista dei dati
-            ListaMetadati = (List<Map>) new GeneratoreMetadati(fileTSV); //genero la lista dei metadati
+        if(Files.exists ( Paths.get ( fileTSV) )){//controllo se il file è presente in loacele
+            Parsing parse= new Parsing(fileTSV);
+            ListaDati = parse.getRecord();
+            GeneratoreMetadati meta= new GeneratoreMetadati(fileTSV);//eseguo il parsing del file, generando la lista dei dati
+            ListaMetadati = meta.getMetadata(); //genero la lista dei metadati
         }else{
             try {//La classe astratta URL Connection è la superclasse di tutte le classi che rappresentano un collegamento di comunicazione tra l'applicazione e un URL. Le istanze di questa classe possono essere utilizzate sia per leggere che per scrivere nella risorsa a cui fa riferimento l'URL.
                 URLConnection openConnection = new URL(url).openConnection(); //L'oggetto connessione openConnection viene creato richiamando sull'url di igresso openConnection (metodo di URLConnection)
@@ -66,7 +68,8 @@ public class ServiceAzAgr {
                         String format = (String) o.get("format"); // l'oggetto di tipo String format conterrà il valore associato alla chiave format
                         String urlD = (String) o.get("url"); // l'oggetto di tipo String urlD conterrà il valore associato alla chiave url
                         if (format.toLowerCase().contains("tsv")) {
-                            downloadTSV(urlD, fileTSV ); //eseguo il download
+                            downloadTSV(urlD , fileTSV ) ;
+                            //Files.copy(Paths.get(urlD), Paths.get (fileTSV) ); //eseguo il download
                         }
                     }
                 }
@@ -78,6 +81,9 @@ public class ServiceAzAgr {
         }
     }
 
+    /**
+    *Metodo che effettua il download
+    *  */
     private static void downloadTSV(String url, String fileName) throws Exception {
         HttpURLConnection openConnection = (HttpURLConnection) new URL(url).openConnection();
         openConnection.addRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:25.0) Gecko/20100101 Firefox/25.0");
@@ -116,7 +122,21 @@ public class ServiceAzAgr {
             try {
                 if(Anni.contains(Campo)){ //verifico il caso in cui il nome del campo si uno degli anni all'interno del vettore time
                     for(AziendaAgricola Azienda : ListaDati){
-                        Object o = Azienda.getTime()[Integer.parseInt(Campo)];
+                        int var_controllo = Integer.parseInt(Campo) ;
+                        int k = 0;
+                        switch (var_controllo){
+                            case 2005 :
+                                break;
+                            case 2007 : k = 1;
+                                break;
+                            case 2010 : k = 2;
+                                break;
+                            case 2013 : k = 3;
+                                break;
+                            default:
+                                throw new IllegalStateException("Unexpected value: " + var_controllo);
+                        }
+                        Object o = Azienda.getTime()[k]; //Integer.parseInt(Campo)
                         valoriCampo.add(o);
                     }
                 }else{

@@ -17,10 +17,11 @@ import java.util.Map;
  */
 public class GeneratoreMetadati {
         private static List<Map> Metadati = new ArrayList<>(); //creo lista di mappe per i metadati degli attributi, ogni mappa conterrà i metadati di un singolo attributo : nome nella classe, nome nel file, tipo
-        /**
-        * Genero la lista dei metadati: nome dei campi nel dataset , il nome e il tipo della variabile nella classe modello
+
+    /**
+        * Attraverso il costruttore genero la lista dei metadati: nome dei campi nel dataset , il nome e il tipo della variabile nella classe modello
         *  */
-        public GeneratoreMetadati(String fileTSV) throws IOException {
+        GeneratoreMetadati(String fileTSV) throws IOException {
             //List <Map> Metadati = new ArrayList<>();
             final String TAB_DELIMITER = "\t"; //definisco il separatore TSV
             int k = 0; //inizializzo variabile contatore
@@ -38,8 +39,15 @@ public class GeneratoreMetadati {
                 Metadati.add(map); //vado ad aggiungere la mappa con i metadati relativi all'attributo corrente nella lista dei metadati
                 k++;
             }
-        };
-};
+        }
+
+    /**
+     * metodo per restituire i metadati
+     *  */
+        public List<Map> getMetadata(){
+            return Metadati;
+        }
+}
 
 
 
