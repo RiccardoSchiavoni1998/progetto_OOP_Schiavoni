@@ -43,7 +43,9 @@ public class ServiceAzAgr {
             ListaMetadati = meta.getMetadata(); //genero la lista dei metadati
         }else{
             try {//La classe astratta URL Connection è la superclasse di tutte le classi che rappresentano un collegamento di comunicazione tra l'applicazione e un URL. Le istanze di questa classe possono essere utilizzate sia per leggere che per scrivere nella risorsa a cui fa riferimento l'URL.
+                /*
                 URLConnection openConnection = new URL(url).openConnection(); //L'oggetto connessione openConnection viene creato richiamando sull'url di igresso openConnection (metodo di URLConnection)
+
                 openConnection.addRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:25.0) Gecko/20100101 Firefox/25.0");//aggiungo user-agent alla connessione.( permetterà di visualizzare contenuti che sono stati concepiti per altre piattaforme)
                 InputStream in = openConnection.getInputStream(); //rinidirizzo il flusso di input  creando oggetto in e apro canale di input del json ottenuto dall'url
                 StringBuilder data = new StringBuilder(); // data è oggetto della classe StringBuilder, a differenza della classe String mi permette di definire una stringa di lunghezza variabile
@@ -57,8 +59,11 @@ public class ServiceAzAgr {
                 } finally {
                     in.close(); //chiudo lo stream
                 }
+
+                 */
                 //lettura del file salvato su stringa e conversione in oggetto
-                JSONObject objText = (JSONObject) JSONValue.parseWithException(data.toString()); //creo un oggetto JSON (di tipo JSONObject) e al costruttore passo il contenuto della stringa data
+                String line = getContent(url);
+                JSONObject objText = (JSONObject) JSONValue.parseWithException(line); //creo un oggetto JSON (di tipo JSONObject) e al costruttore passo il contenuto della stringa data
                 JSONObject objResult = (JSONObject) (objText.get("result")); //creo il JSONObject objResult e attraverso il costruttore gli assegno il valori dell'array associativo "result" all'interno del file JSON
                 JSONArray objResources = (JSONArray) (objResult.get("resources")); //creo objResources , oggetto di tipo JSONArray. Prendo il conenuto dell' array associativo resources (all'interno di objResult )e lo passo al costruttore di objResult
 
@@ -102,6 +107,36 @@ public class ServiceAzAgr {
         } finally {
             in.close();
         }
+    }
+
+    /**
+     * metodo che gestisce il redirect*/
+    private static String getContent(String url) throws Exception {
+        HttpURLConnection openConnection = (HttpURLConnection) new URL(url).openConnection();
+        openConnection.addRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:25.0) Gecko/20100101 Firefox/25.0");
+        InputStream in = openConnection.getInputStream();
+        String data = "";
+        String line = "";
+        try {
+            if(openConnection.getResponseCode() >= 300 && openConnection.getResponseCode() < 400) {
+                data = getContent(openConnection.getHeaderField("Location"));        //Richiama il metodo downloadTSV
+                in.close();
+                openConnection.disconnect();
+                return data;
+            }
+            try { //lettura JSON e salvataggio su stringa
+                InputStreamReader inR = new InputStreamReader(in); //creo oggetto inR , uno stream basico per la lettura , al costruttore passo l'oggetto in che lo collega al flusso di dati in input del file json
+                BufferedReader buf = new BufferedReader(inR); //creo oggetto buf , stream bufferizzato , al costruttore del quale passo lo stream basico in
+                while ((line = buf.readLine()) != null) { //vado a leggere il file json , il quale è su un unica riga, salvandolo sulla stringa line
+                    data+=line; //aggiungo il contenuto di line a data (data += line)
+                }
+            } finally {
+                in.close(); //chiudo lo stream
+            }
+        } finally {
+            in.close();
+        }
+        return data;
     }
 
     /**
