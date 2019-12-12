@@ -14,6 +14,9 @@ public class Parsing {
 
     /**
      * costruttore che legge il contenuto del fileTSV e genera la lista dei dati alll'interno
+     *
+     *
+     * @throws Exception
      */
     public Parsing (String FileTSV) throws Exception { //vado a creare una lista di istanze della classe AziendaAgricola , i campi dell'istanza i-esima conterranno i rispettivi valori dell'i-esima riga del filE
         //creo oggetto br, straem bufferizzato, e passo al costruttore lo stream basico (va a leggere il fileTSV)
@@ -44,9 +47,11 @@ public class Parsing {
     }
 
     /**
-     * metodo che restituisce tutti i dati del dataset
+     * Metodo che restituisce tutti i dati del dataset
+     *
+     * @return tutti i dati del file sotto forma di lista di oggetti
      */
-    public List<AziendaAgricola> getRecord(){
+    public List<AziendaAgricola> getListaDati(){
         return dati;
     }
 

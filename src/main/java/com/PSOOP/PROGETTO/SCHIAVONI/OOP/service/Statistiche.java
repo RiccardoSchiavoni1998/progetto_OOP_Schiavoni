@@ -10,7 +10,10 @@ import java.util.Map;
 public class Statistiche {
 
     /**
-     * metodo per il calcolo del minimo
+     * Metodo per il calcolo del minimo
+     *
+     * @param lista
+     * @return valore minimo lista
      */
     public static double valoreminimo(List<Double> lista) {
         double min;
@@ -23,6 +26,8 @@ public class Statistiche {
 
     /**
      * metodo per il calcolo del massimo
+     * @param lista
+     * @return valore massimo
      */
     public static double valoremassimo(List<Double> lista) {
         double max;
@@ -35,6 +40,9 @@ public class Statistiche {
 
     /**
      * metodo per il calcolo del valor medio
+     *
+     * @param lista
+     * @return valor medio della lista
      */
     public static double valormedio(List<Double> lista) {
         return sommavalori(lista) / numerovalori(lista) ;
@@ -42,6 +50,9 @@ public class Statistiche {
 
     /**
      * metodo per il calcolo della deviazione standard
+     *
+     * @param lista
+     * @return deviazione standard dei valori della lista
      */
     public static double deviazionestandard(List<Double> lista) {
         double avg = valormedio(lista) ;
@@ -54,6 +65,9 @@ public class Statistiche {
 
     /**
      * metodo per il calcolo della somma
+     *
+     * @param lista
+     * @return somma elementi lista
      */
     public static double sommavalori(List<Double> lista) {
         double somma = 0;
@@ -65,13 +79,19 @@ public class Statistiche {
 
     /**
      * metodo per il calcolo del numero totale di elementi in una colonna di attributi
+     *
+     * @param lista
+     * @return numero elementi lista
      */
     public static double numerovalori(List<Double> lista) {
         return lista.size();
     }
 
     /**
-     * metodo per il conteggio degli elementi unici
+     * metodo per il conteggio di quante volte compare un elemento nella lista
+     *
+     * @param lista
+     * @return Mappa : chiavi = elementi lista , valori = numero di occorrenze
      */
     public static Map< Object, Integer >  conteggioElementiUnici(List lista){ //considero ogni oggetto come una chiave associata ad un valore di tipo intero che indica quante volte è presente
         Map<Object, Integer> map = new HashMap<>();
@@ -84,6 +104,10 @@ public class Statistiche {
 
     /**
      * metodo per ottenere le statistiche (formato JSON) sui dati specificando su quale attributo (colonna di dati) si effettua la computazione
+     *
+     * @param attributo dalla quale si estrae la lista di valori
+     * @param lista
+     * @return Mappa : chiavi = nome singola statistica calcolata , valori = risultato del singolo calcolo statistico
      */
     public static Map<String,Object> statisticheSingoloCampo(List lista, String attributo){
         Map<String,Object> map = new HashMap<>();
@@ -109,4 +133,6 @@ public class Statistiche {
         }
         return map;
     }
+
+
 }

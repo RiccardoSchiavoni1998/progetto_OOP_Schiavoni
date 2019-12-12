@@ -30,6 +30,8 @@ public class Controller {
 
     /**
      * Metodo GET che rstituisce tutti i metadati
+     *
+     * @return lista dei Metadati
      */
     @GetMapping("/metadata")
     public List<Map> visualizzaMetadati(){
@@ -38,6 +40,8 @@ public class Controller {
 
     /**
      *Metodo GET che restituisce la lista completa dei dati del dataset
+     *
+     * @return lista dei dati
      */
     @GetMapping("/data")
     public List<AziendaAgricola> visualizzaDati(){

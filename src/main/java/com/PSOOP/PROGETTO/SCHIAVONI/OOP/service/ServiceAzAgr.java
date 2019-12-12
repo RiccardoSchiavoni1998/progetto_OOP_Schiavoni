@@ -25,11 +25,13 @@ public class ServiceAzAgr {
     private String fileTSV= "dataset.tsv";
     private String url= "http://data.europa.eu/euodp/data/api/3/action/package_show?id=PsCGW1qneloocoRKWv6ZYA"; //url di ingresso (del file JSON)
     static List<String> Anni=new ArrayList<>();
-    private static List<Map> ListaMetadati = new ArrayList(); //creo lista di mappe per i metadati degli attributi, ogni mappa conterrà i metadati di un singolo attributo : nome nel file, nome e tipo nella classe
-    private List<AziendaAgricola> ListaDati = new ArrayList<>();
+    private static List<Map> listaMetadati = new ArrayList(); //creo lista di mappe per i metadati degli attributi, ogni mappa conterrà i metadati di un singolo attributo : nome nel file, nome e tipo nella classe
+    private List<AziendaAgricola> listaDati = new ArrayList<>();
 
     /**
      * Costruttore della classe, esegue la codifica del file JSON ed esegue il download, in seguito riempie la lista dei Dati e dei Metadati
+     *
+     * @throws Exception
      */
     public ServiceAzAgr() throws Exception {
         Anni.add(Integer.toString(2005)); // creo il vettore degli anni che mi servirà nella creazione delle statistiche
@@ -37,31 +39,12 @@ public class ServiceAzAgr {
         Anni.add(Integer.toString(2010));
         Anni.add(Integer.toString(2013));
         if(Files.exists ( Paths.get ( fileTSV) )){//controllo se il file è presente in loacele
-            Parsing parse= new Parsing(fileTSV);
-            ListaDati = parse.getRecord();
-            GeneratoreMetadati meta= new GeneratoreMetadati(fileTSV);//eseguo il parsing del file, generando la lista dei dati
-            ListaMetadati = meta.getMetadata(); //genero la lista dei metadati
+            Parsing parse= new Parsing(fileTSV); //creo un istanza della classe parsing e richiamo su di esso il costruttore andando a valorizzare i dati presenti nel fileTSV l'attributo "dati" (lista di Oggetti)
+            listaDati = parse.getListaDati(); //genero la lista dei dati: richiamo il metodo getDati sull'oggetto parse, assegnando l'attributo "dati" a ListaDati
+            GeneratoreMetadati meta= new GeneratoreMetadati(fileTSV);///creo un istanza della classe GeneratoreMetadati e richiamo su di esso il costruttore andando a valorizzare l'attributo "dati" (lista di Map) con i metadati dei dati presenti nel fileTSV
+            listaMetadati = meta.getMetadata(); //genero la lista dei metadati: richiamo il metodo getMetadati sull'oggetto meta, assegnando l'attributo "dati" a Metadata
         }else{
-            try {//La classe astratta URL Connection è la superclasse di tutte le classi che rappresentano un collegamento di comunicazione tra l'applicazione e un URL. Le istanze di questa classe possono essere utilizzate sia per leggere che per scrivere nella risorsa a cui fa riferimento l'URL.
-                /*
-                URLConnection openConnection = new URL(url).openConnection(); //L'oggetto connessione openConnection viene creato richiamando sull'url di igresso openConnection (metodo di URLConnection)
-
-                openConnection.addRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:25.0) Gecko/20100101 Firefox/25.0");//aggiungo user-agent alla connessione.( permetterà di visualizzare contenuti che sono stati concepiti per altre piattaforme)
-                InputStream in = openConnection.getInputStream(); //rinidirizzo il flusso di input  creando oggetto in e apro canale di input del json ottenuto dall'url
-                StringBuilder data = new StringBuilder(); // data è oggetto della classe StringBuilder, a differenza della classe String mi permette di definire una stringa di lunghezza variabile
-                String line = "";
-                try { //lettura JSON e salvataggio su stringa
-                    InputStreamReader inR = new InputStreamReader(in); //creo oggetto inR , uno stream basico per la lettura , al costruttore passo l'oggetto in che lo collega al flusso di dati in input del file json
-                    BufferedReader buf = new BufferedReader(inR); //creo oggetto buf , stream bufferizzato , al costruttore del quale passo lo stream basico in
-                    while ((line = buf.readLine()) != null) { //vado a leggere il file json , il quale è su un unica riga, salvandolo sulla stringa line
-                        data.append(line); //aggiungo il contenuto di line a data (data += line)
-                    }
-                } finally {
-                    in.close(); //chiudo lo stream
-                }
-
-                 */
-                //lettura del file salvato su stringa e conversione in oggetto
+            try {
                 String line = getContent(url);
                 JSONObject objText = (JSONObject) JSONValue.parseWithException(line); //creo un oggetto JSON (di tipo JSONObject) e al costruttore passo il contenuto della stringa data
                 JSONObject objResult = (JSONObject) (objText.get("result")); //creo il JSONObject objResult e attraverso il costruttore gli assegno il valori dell'array associativo "result" all'interno del file JSON
@@ -74,12 +57,11 @@ public class ServiceAzAgr {
                         String urlD = (String) o.get("url"); // l'oggetto di tipo String urlD conterrà il valore associato alla chiave url
                         if (format.toLowerCase().contains("tsv")) {
                             downloadTSV(urlD , fileTSV ) ;
-                            //Files.copy(Paths.get(urlD), Paths.get (fileTSV) ); //eseguo il download
                         }
                     }
                 }
-                ListaDati = (List<AziendaAgricola>) new Parsing(fileTSV); //eseguo il parsing del file scaricato, generando la lista dei dati
-                ListaMetadati = (List<Map>) new GeneratoreMetadati(fileTSV); //genero la lista dei metadati
+                listaDati = (List<AziendaAgricola>) new Parsing(fileTSV); //eseguo il parsing del file scaricato, generando la lista dei dati
+                listaMetadati  = (List<Map>) new GeneratoreMetadati(fileTSV); //genero la lista dei metadati
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -88,16 +70,19 @@ public class ServiceAzAgr {
 
     /**
     *Metodo che effettua il download
+     *  @param url url del sito dal quale scaricare il file
+     *  @param fileName nome del file
+     *  @throws Exception lancia l'eccezione
     *  */
     private static void downloadTSV(String url, String fileName) throws Exception {
-        HttpURLConnection openConnection = (HttpURLConnection) new URL(url).openConnection();
-        openConnection.addRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:25.0) Gecko/20100101 Firefox/25.0");
-        InputStream in = openConnection.getInputStream();
+        HttpURLConnection openConnection = (HttpURLConnection) new URL(url).openConnection();  //L'oggetto connessione di rete al server HTTP openConnection viene creato richiamando il metodo openConnection sull'url di ingresso
+        openConnection.addRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:25.0) Gecko/20100101 Firefox/25.0"); //aggiungo user-agent alla connessione.( permetterà di visualizzare contenuti che sono stati concepiti per altre piattaforme)
+        InputStream in = openConnection.getInputStream(); //rinidirizzo il flusso di input creando oggetto in e apro canale di input del json ottenuto dall'url
         String data = "";
         String line = "";
         try {
             if(openConnection.getResponseCode() >= 300 && openConnection.getResponseCode() < 400) {
-                downloadTSV(openConnection.getHeaderField("Location"),fileName);        //Richiama il metodo downloadTSV
+                downloadTSV(openConnection.getHeaderField("Location"),fileName);  //Richiama il metodo downloadTSV
                 in.close();
                 openConnection.disconnect();
                 return;
@@ -110,25 +95,30 @@ public class ServiceAzAgr {
     }
 
     /**
-     * metodo che gestisce il redirect*/
+     *  Metodo che gestisce il redirect
+     *
+     *  @param url url del sito dal quale scaricare il file
+     * @throws Exception
+     * */
     private static String getContent(String url) throws Exception {
-        HttpURLConnection openConnection = (HttpURLConnection) new URL(url).openConnection();
-        openConnection.addRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:25.0) Gecko/20100101 Firefox/25.0");
-        InputStream in = openConnection.getInputStream();
+        HttpURLConnection openConnection = (HttpURLConnection) new URL(url).openConnection(); //L'oggetto connessione di rete al server HTTP openConnection viene creato richiamando il metodo openConnection sull'url di ingresso
+        openConnection.addRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:25.0) Gecko/20100101 Firefox/25.0"); //aggiungo user-agent alla connessione.( permetterà di visualizzare contenuti che sono stati concepiti per altre piattaforme)
+        InputStream in = openConnection.getInputStream(); //rinidirizzo il flusso di input  creando oggetto in e apro canale di input del json ottenuto dall'url
         String data = "";
         String line = "";
         try {
+            //gestione del redirect
             if(openConnection.getResponseCode() >= 300 && openConnection.getResponseCode() < 400) {
-                data = getContent(openConnection.getHeaderField("Location"));        //Richiama il metodo downloadTSV
-                in.close();
-                openConnection.disconnect();
+                data = getContent(openConnection.getHeaderField("Location")); // attraverso questo assegnamento ora all'interno di data ora avrò gli header file HTTP : componenti della sezione di intestazione dei messaggi di richiesta e risposta in HTTP, essi definiscono i parametri operativi di una transazione HTTP.)
+                in.close(); //chiudo il buffer in input
+                openConnection.disconnect(); //disconnect metodo che serve per disconnettere il server
                 return data;
             }
             try { //lettura JSON e salvataggio su stringa
                 InputStreamReader inR = new InputStreamReader(in); //creo oggetto inR , uno stream basico per la lettura , al costruttore passo l'oggetto in che lo collega al flusso di dati in input del file json
                 BufferedReader buf = new BufferedReader(inR); //creo oggetto buf , stream bufferizzato , al costruttore del quale passo lo stream basico in
                 while ((line = buf.readLine()) != null) { //vado a leggere il file json , il quale è su un unica riga, salvandolo sulla stringa line
-                    data+=line; //aggiungo il contenuto di line a data (data += line)
+                    data+=line; //aggiung ogni volta il contenuto attuale di line a data (data += line)
                 }
             } finally {
                 in.close(); //chiudo lo stream
@@ -136,27 +126,34 @@ public class ServiceAzAgr {
         } finally {
             in.close();
         }
-        return data;
+        return data; //mi restitusce data contente il file JSON
     }
 
     /**
      * Metodo che genera la lista dei Dati
+     *
+     * @return ListaDati
      */
-     public List<AziendaAgricola> getDati(){return ListaDati;}
+     public List<AziendaAgricola> getDati(){return listaDati;}
 
     /**
-     * Metodo che genera la lista dei Metadati
+     * Metodo che genera la lista di mappe ognuna con i Metadati di un attributo
+     *
+     * @return List dei metadati
      */
-    public List<Map> getMetadati(){return ListaMetadati;}
+    public List<Map> getMetadati(){return listaMetadati ;}
 
     /**
      * Metodo che crea una lista con tutti i valori di un singolo attributo della classe
-     */
+     *
+     * @param Campo di cui voglio ottenere i valori
+     * @return lista con valori del campo
+      */
     private List listaValoriCampo(String Campo){
             List<Object> valoriCampo = new ArrayList<>();
             try {
                 if(Anni.contains(Campo)){ //verifico il caso in cui il nome del campo si uno degli anni all'interno del vettore time
-                    for(AziendaAgricola Azienda : ListaDati){
+                    for(AziendaAgricola Azienda : listaDati){
                         int var_controllo = Integer.parseInt(Campo) ;
                         int k = 0;
                         switch (var_controllo){
@@ -175,7 +172,7 @@ public class ServiceAzAgr {
                         valoriCampo.add(o);
                     }
                 }else{
-                    for(AziendaAgricola Azienda : ListaDati){
+                    for(AziendaAgricola Azienda : listaDati ){
                         Method getter = AziendaAgricola.class.getMethod("get" + Campo.substring(0, 1).toUpperCase() + Campo.substring(1)); //costruisco il metodo get del modello di riferimento
                         Object value = getter.invoke(Azienda); //invoco il metodo get sull'oggetto della classe modellante
                         valoriCampo.add(value); //aggiungo il valore alla lista
@@ -189,7 +186,10 @@ public class ServiceAzAgr {
         }
 
     /**
-     * Metodo che genera un mappa<k,v> con tutte le statistiche dell'attributo che gli viene passato
+     * Metodo che genera un mappa con tutte le statistiche dell'attributo che gli viene passato
+     *
+     * @param Campo
+     * @return Map contentente statistiche di quel campo
      */
     public Map<String, Object> getStatisticheSingoloCampo(String Campo){
         return Statistiche.statisticheSingoloCampo(listaValoriCampo(Campo), Campo);

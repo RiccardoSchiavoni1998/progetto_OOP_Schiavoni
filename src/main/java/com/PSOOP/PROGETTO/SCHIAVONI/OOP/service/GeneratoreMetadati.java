@@ -20,7 +20,9 @@ public class GeneratoreMetadati {
 
     /**
         * Attraverso il costruttore genero la lista dei metadati: nome dei campi nel dataset , il nome e il tipo della variabile nella classe modello
-        *  */
+        *
+        * @throws IOException
+     */
         GeneratoreMetadati(String fileTSV) throws IOException {
             //List <Map> Metadati = new ArrayList<>();
             final String TAB_DELIMITER = "\t"; //definisco il separatore TSV
@@ -30,6 +32,7 @@ public class GeneratoreMetadati {
             String line = br.readLine() ; // vado a leggere il file TSV
             line = line.replace (",", TAB_DELIMITER );
             line = line.replace ("/", TAB_DELIMITER );
+            line = line.replace("\\", TAB_DELIMITER);
             String[] orderedline = line.trim().split(TAB_DELIMITER); //trim elimina gli spazi bianchi alle estremità di una stringa mentre split spezza la stringa ogni volta che incontra un "\t"
             for (Field f : fields) { //scorro tutti i campi dell'array (considero singolarmente ogni attributo della classe)
                 Map<String, String> map = new HashMap<>();  //creo una mappa chiave valore , che conterrà i metadati relativi all'attributo corrente (contenuto nell'oggetto f)
@@ -42,7 +45,9 @@ public class GeneratoreMetadati {
         }
 
     /**
-     * metodo per restituire i metadati
+     * Metodo per restituire i metadati
+     *
+     * @return Metadati sotto forma di lista di mappe ognuna contenente i metadati di un singolo attributo
      *  */
         public List<Map> getMetadata(){
             return Metadati;
