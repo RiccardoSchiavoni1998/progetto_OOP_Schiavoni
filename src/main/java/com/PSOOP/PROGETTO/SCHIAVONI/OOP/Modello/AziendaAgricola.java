@@ -5,8 +5,8 @@ import java.util.Vector;
 public class AziendaAgricola {
     private String agrarea; //area agricola totale
     private String croparea;  //area totale seminata in un determinato anno
-    private String indic_ef;
-    private String geo;
+    private String indic_ef; //
+    private String geo; //sigla nazione
     private Double [] time;
 
     /**

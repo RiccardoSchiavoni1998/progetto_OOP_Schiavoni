@@ -38,11 +38,8 @@ public class ServiceAzAgr {
         Anni.add(Integer.toString(2007));
         Anni.add(Integer.toString(2010));
         Anni.add(Integer.toString(2013));
-        if(Files.exists ( Paths.get ( fileTSV) )){//controllo se il file è presente in loacele
-            Parsing parse= new Parsing(fileTSV); //creo un istanza della classe parsing e richiamo su di esso il costruttore andando a valorizzare i dati presenti nel fileTSV l'attributo "dati" (lista di Oggetti)
-            listaDati = parse.getListaDati(); //genero la lista dei dati: richiamo il metodo getDati sull'oggetto parse, assegnando l'attributo "dati" a ListaDati
-            GeneratoreMetadati meta= new GeneratoreMetadati(fileTSV);///creo un istanza della classe GeneratoreMetadati e richiamo su di esso il costruttore andando a valorizzare l'attributo "dati" (lista di Map) con i metadati dei dati presenti nel fileTSV
-            listaMetadati = meta.getMetadata(); //genero la lista dei metadati: richiamo il metodo getMetadati sull'oggetto meta, assegnando l'attributo "dati" a Metadata
+        if(Files.exists ( Paths.get ( fileTSV) )){//controllo se il file è presente in locale
+            System.out.println ( "Dataset presete i locale" );
         }else{
             try {
                 String line = getContent(url);
@@ -60,12 +57,14 @@ public class ServiceAzAgr {
                         }
                     }
                 }
-                listaDati = (List<AziendaAgricola>) new Parsing(fileTSV); //eseguo il parsing del file scaricato, generando la lista dei dati
-                listaMetadati  = (List<Map>) new GeneratoreMetadati(fileTSV); //genero la lista dei metadati
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
+        Parsing parse= new Parsing(fileTSV); //creo un istanza della classe parsing e richiamo su di esso il costruttore andando a valorizzare i dati presenti nel fileTSV l'attributo "dati" (lista di Oggetti)
+        listaDati = parse.getListaDati(); //genero la lista dei dati: richiamo il metodo getDati sull'oggetto parse, assegnando l'attributo "dati" a ListaDati
+        GeneratoreMetadati meta= new GeneratoreMetadati(fileTSV);///creo un istanza della classe GeneratoreMetadati e richiamo su di esso il costruttore andando a valorizzare l'attributo "dati" (lista di Map) con i metadati dei dati presenti nel fileTSV
+        listaMetadati = meta.getMetadata(); //genero la lista dei metadati: richiamo il metodo getMetadati sull'oggetto meta, assegnando l'attributo "dati" a Metadata
     }
 
     /**

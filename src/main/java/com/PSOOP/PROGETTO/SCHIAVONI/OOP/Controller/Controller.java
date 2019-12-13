@@ -23,7 +23,7 @@ import java.util.Map;
 public class Controller {
     private ServiceAzAgr service;
 
-    @Autowired //dependency injection
+    @Autowired
     public Controller(ServiceAzAgr service) {
         this.service = service;
     }
@@ -48,7 +48,11 @@ public class Controller {
         return service.getDati();
     }
 
-    @GetMapping("/StatisticheCampo")
+    /*
+    * Metodo GET che restituisce le statistiche di un determinato campo
+    *
+    * */
+    @GetMapping("/statisticheCampo")
     public Map visualizzaStatisticheCampo(@RequestParam (value="campo", required = false,defaultValue ="") String Campo) {
         return service.getStatisticheSingoloCampo(Campo);
     }
